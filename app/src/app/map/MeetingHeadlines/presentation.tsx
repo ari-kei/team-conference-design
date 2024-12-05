@@ -7,7 +7,6 @@ import {
   CardTitle,
 } from "@/app/_components/ui/card";
 import SearchBar from "@/app/_components/ui/searchbar";
-import { cn } from "@/app/_lib/utils";
 import { type Meeting } from "@/app/domain/meeting";
 import { format } from "date-fns/fp";
 import { useState } from "react";
@@ -17,9 +16,11 @@ import MeetingDetail from "@/app/_components/meeting/meetingdetail";
 export default function MeetingHeadlinesPresentation(prop: {
   meetings: Meeting[];
 }) {
+  const [searchHeadline, setSearchHeadline] = useState("");
+  // TODO searchHeadlineで表示する会議を絞る
   const meetings = prop.meetings;
-  const searchParam = useSearchParams();
 
+  const searchParam = useSearchParams();
   const [focusedMeetingId, setForcusedMeetingId] = useState<string | null>(
     searchParam.get("detail")
   );
@@ -60,25 +61,30 @@ export default function MeetingHeadlinesPresentation(prop: {
   return (
     <div className="absolute top-0 left-0 z-10 flex">
       <div>
-        <SearchBar className="w-[330px]" />
+        <SearchBar
+          searchValue={searchHeadline}
+          setSearchValue={setSearchHeadline}
+        />
         <span className="bg-white h-screen">
           {meetings.map((meeting) => {
             return (
-              <span className="flex" key={meeting.id}>
-                <Card
-                  className={cn("w-[330px]", "h-fit", "text-text-primary")}
-                  onClick={() => handleDetail(meeting)}
-                >
-                  <CardHeader>
-                    <CardTitle>{meeting.name}</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p>{meeting.teamName}</p>
-                    <p>{format("yyyy/MM/dd", meeting.date)}</p>
-                    <p>{"@" + meeting.place}</p>
-                  </CardContent>
-                </Card>
-              </span>
+              <div className="flex" key={meeting.id}>
+                <button className="w-full text-left text-lg">
+                  <Card
+                    className="text-text-primary"
+                    onClick={() => handleDetail(meeting)}
+                  >
+                    <CardHeader>
+                      <CardTitle>{meeting.name}</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <p>{meeting.teamName}</p>
+                      <p>{format("yyyy/MM/dd", meeting.date)}</p>
+                      <p>{"@" + meeting.place}</p>
+                    </CardContent>
+                  </Card>
+                </button>
+              </div>
             );
           })}
         </span>
