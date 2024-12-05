@@ -40,15 +40,17 @@ export default function MeetingDetail({
       <CardHeader>
         <CardTitle className="text-4xl flex justify-between">
           {meeting.name}
-          <Image
-            className="dark:invert"
-            src="/close.svg"
-            alt="close"
-            width={32}
-            height={32}
-            priority
-            onClick={() => handleDetail(null)}
-          />
+          <button>
+            <Image
+              className="dark:invert"
+              src="/close.svg"
+              alt="close"
+              width={32}
+              height={32}
+              priority
+              onClick={() => handleDetail(null)}
+            />
+          </button>
         </CardTitle>
         <CardDescription>
           <div className="block w-fit mb-1 p-2 bg-icon text-white rounded-lg">
@@ -107,7 +109,7 @@ export default function MeetingDetail({
                   <p className="mr-4">{format("yyyy/MM/dd", createDate)}</p>
                 </div>
                 <form className="pb-2">
-                  <div className="relative w-full max-w-sm">
+                  <div className="w-full max-w-sm flex">
                     <input
                       type="text"
                       name={"comment" + id}
@@ -117,24 +119,28 @@ export default function MeetingDetail({
                       disabled={edittingComment === id ? false : true}
                       ref={edittingComment === id ? ref : null}
                     />
-                    <Image
-                      className="dark:invert absolute top-3 right-10"
-                      src="/edit.svg"
-                      alt="close"
-                      width={32}
-                      height={32}
-                      priority
-                      onClick={() => handleExistedComment(id, "edit")}
-                    />
-                    <Image
-                      className="dark:invert absolute top-3 right-1"
-                      src="/delete.svg"
-                      alt="close"
-                      width={32}
-                      height={32}
-                      priority
-                      onClick={() => handleExistedComment(id, "delete")}
-                    />
+                    <button onClick={(e) => e.preventDefault()}>
+                      <Image
+                        className="dark:invert mx-1"
+                        src="/edit.svg"
+                        alt="close"
+                        width={32}
+                        height={32}
+                        priority
+                        onClick={() => handleExistedComment(id, "edit")}
+                      />
+                    </button>
+                    <button onClick={(e) => e.preventDefault()}>
+                      <Image
+                        className="dark:invert mx-1"
+                        src="/delete.svg"
+                        alt="close"
+                        width={32}
+                        height={32}
+                        priority
+                        onClick={() => handleExistedComment(id, "delete")}
+                      />
+                    </button>
                   </div>
                   <div className={id === edittingComment ? "block" : "hidden"}>
                     <Button
