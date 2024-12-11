@@ -1,34 +1,65 @@
 import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import Leaflet from "leaflet";
-
+import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
-const DefaultIcon = Leaflet.icon({
-  iconUrl: icon.src,
-  shadowUrl: iconShadow.src,
+L.Icon.Default.mergeOptions({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
   popupAnchor: [12, 0],
 });
-Leaflet.Marker.prototype.options.icon = DefaultIcon;
 
-export default function Map() {
+type MapComponentProps = {
+  geocodes: { lat: number; lng: number }[];
+};
+
+type MarkerComponentProps = {
+  geocodes: { lat: number; lng: number }[];
+};
+
+const Markers = ({ geocodes }: MarkerComponentProps) => {
+  return (
+    <>
+      {geocodes.map((geocode, index) => (
+        <span key={index}>
+          <Marker position={geocode}>
+            <Popup>
+              A pretty CSS3 popup. <br /> Easily customizable.
+            </Popup>
+          </Marker>
+        </span>
+      ))}
+    </>
+  );
+};
+
+export default function Map(props: MapComponentProps) {
+  const geocodes = props.geocodes;
+  const center: { lat: number; lng: number } =
+    geocodes.length > 0
+      ? {
+          lat: geocodes[0].lat,
+          lng: geocodes[0].lng,
+        }
+      : {
+          // 一旦皇居にしている
+          lat: 35.685175,
+          lng: 139.7528,
+        };
+
   return (
     <MapContainer
-      center={[51.505, -0.09]}
-      zoom={13}
-      scrollWheelZoom={false}
+      center={[center.lat, center.lng]}
+      zoom={15}
+      scrollWheelZoom={true}
       style={{ height: "100vh", width: "100%" }}
     >
       <TileLayer
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}"
       />
-      <Marker position={[51.505, -0.09]}>
-        <Popup>
-          A pretty CSS3 popup. <br /> Easily customizable.
-        </Popup>
-      </Marker>
+      <Markers geocodes={geocodes} />
     </MapContainer>
   );
 }
