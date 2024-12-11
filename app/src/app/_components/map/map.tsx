@@ -1,6 +1,6 @@
-import { MapContainer, Marker, Popup, TileLayer } from "react-leaflet";
+import { MapContainer, Marker, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import L from "leaflet";
+import L, { LeafletMouseEvent } from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 
@@ -18,17 +18,29 @@ type MarkerComponentProps = {
   geocodes: { lat: number; lng: number }[];
 };
 
+// MeetingDetailを表示することなどを考慮して、中心位置を調整する
+const adjaster = { lat: 0, lng: 0.01 };
+const zoom = 15;
+
 const Markers = ({ geocodes }: MarkerComponentProps) => {
+  const map = useMap();
+  const center = (e: LeafletMouseEvent) => {
+    map.setView(
+      [e.latlng.lat - adjaster.lat, e.latlng.lng - adjaster.lng],
+      zoom
+    );
+  };
+
   return (
     <>
       {geocodes.map((geocode, index) => (
-        <span key={index}>
-          <Marker position={geocode}>
-            <Popup>
-              A pretty CSS3 popup. <br /> Easily customizable.
-            </Popup>
-          </Marker>
-        </span>
+        <Marker
+          key={index}
+          position={geocode}
+          eventHandlers={{
+            click: center,
+          }}
+        />
       ))}
     </>
   );
@@ -36,13 +48,11 @@ const Markers = ({ geocodes }: MarkerComponentProps) => {
 
 export default function Map(props: MapComponentProps) {
   const geocodes = props.geocodes;
-  // MeetingDetailを表示することなどを考慮して、中心位置を調整する
-  const adjaster = { lat: 0, lng: 0.01 };
   const center: { lat: number; lng: number } =
     geocodes.length > 0
       ? {
-          lat: geocodes[0].lat - adjaster.lat,
-          lng: geocodes[0].lng - adjaster.lng,
+          lat: geocodes[0].lat,
+          lng: geocodes[0].lng,
         }
       : {
           // 一旦皇居にしている
@@ -52,8 +62,8 @@ export default function Map(props: MapComponentProps) {
 
   return (
     <MapContainer
-      center={[center.lat, center.lng]}
-      zoom={15}
+      center={[center.lat - adjaster.lat, center.lng - adjaster.lng]}
+      zoom={zoom}
       scrollWheelZoom={true}
       style={{ height: "100vh", width: "100%" }}
     >
