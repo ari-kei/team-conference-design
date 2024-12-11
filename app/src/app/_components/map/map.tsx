@@ -19,8 +19,8 @@ type MarkerComponentProps = {
 };
 
 // MeetingDetailを表示することなどを考慮して、中心位置を調整する
-const adjaster = { lat: 0, lng: 0.01 };
-const zoom = 15;
+const adjaster = { lat: 0, lng: 0.005 };
+const zoom = 16;
 
 const Markers = ({ geocodes }: MarkerComponentProps) => {
   const map = useMap();
