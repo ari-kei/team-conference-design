@@ -36,11 +36,13 @@ const Markers = ({ geocodes }: MarkerComponentProps) => {
 
 export default function Map(props: MapComponentProps) {
   const geocodes = props.geocodes;
+  // MeetingDetailを表示することなどを考慮して、中心位置を調整する
+  const adjaster = { lat: 0, lng: 0.01 };
   const center: { lat: number; lng: number } =
     geocodes.length > 0
       ? {
-          lat: geocodes[0].lat,
-          lng: geocodes[0].lng,
+          lat: geocodes[0].lat - adjaster.lat,
+          lng: geocodes[0].lng - adjaster.lng,
         }
       : {
           // 一旦皇居にしている
