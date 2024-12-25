@@ -1,7 +1,6 @@
-import { GeoCode } from "@/app/domain/map";
 import opencage from "opencage-api-client";
 
-export async function fetchAddress(address: string): Promise<GeoCode> {
+export async function fetchAddress(address: string) {
   return opencage
     .geocode({ q: address })
     .then((data) => {
