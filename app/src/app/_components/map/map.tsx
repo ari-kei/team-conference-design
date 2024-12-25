@@ -11,20 +11,25 @@ L.Icon.Default.mergeOptions({
 });
 
 type MapComponentProps = {
-  geocodes: { lat: number; lng: number }[];
+  center: { meetingId: string; lat: number; lng: number };
+  geocodes: { meetingId: string; lat: number; lng: number }[];
+  handleDetail: (meetingId: string) => void;
 };
 
 type MarkerComponentProps = {
-  geocodes: { lat: number; lng: number }[];
+  geocodes: { meetingId: string; lat: number; lng: number }[];
+  handleDetail: (meetingId: string) => void;
 };
 
 // MeetingDetailを表示することなどを考慮して、中心位置を調整する
 const adjaster = { lat: 0, lng: 0.005 };
 const zoom = 16;
 
-const Markers = ({ geocodes }: MarkerComponentProps) => {
+const Markers = ({ geocodes, handleDetail }: MarkerComponentProps) => {
+  // TODO マーカーがクリックされた際に、MeetingDetailを表示するように修正が必要
   const map = useMap();
-  const center = (e: LeafletMouseEvent) => {
+  const focus = (e: LeafletMouseEvent, meetingId: string) => {
+    handleDetail(meetingId);
     map.setView(
       [e.latlng.lat - adjaster.lat, e.latlng.lng - adjaster.lng],
       zoom
@@ -38,7 +43,7 @@ const Markers = ({ geocodes }: MarkerComponentProps) => {
           key={index}
           position={geocode}
           eventHandlers={{
-            click: center,
+            click: (e: LeafletMouseEvent) => focus(e, geocode.meetingId),
           }}
         />
       ))}
@@ -46,20 +51,11 @@ const Markers = ({ geocodes }: MarkerComponentProps) => {
   );
 };
 
-export default function Map(props: MapComponentProps) {
-  const geocodes = props.geocodes;
-  const center: { lat: number; lng: number } =
-    geocodes.length > 0
-      ? {
-          lat: geocodes[0].lat,
-          lng: geocodes[0].lng,
-        }
-      : {
-          // 一旦皇居にしている
-          lat: 35.685175,
-          lng: 139.7528,
-        };
-
+export default function Map({
+  geocodes,
+  center,
+  handleDetail,
+}: MapComponentProps) {
   return (
     <MapContainer
       center={[center.lat - adjaster.lat, center.lng - adjaster.lng]}
@@ -71,7 +67,7 @@ export default function Map(props: MapComponentProps) {
         attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         url="https://mt1.google.com/vt/lyrs=r&x={x}&y={y}&z={z}"
       />
-      <Markers geocodes={geocodes} />
+      <Markers geocodes={geocodes} handleDetail={handleDetail} />
     </MapContainer>
   );
 }
