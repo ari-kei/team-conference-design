@@ -1,5 +1,6 @@
 "use client";
 
+import Map from "@/app/_components/map/map";
 import {
   Card,
   CardContent,
@@ -15,10 +16,12 @@ import MeetingDetail from "@/app/_components/meeting/meetingdetail";
 
 export default function MeetingHeadlinesPresentation(prop: {
   meetings: Meeting[];
+  geocodes: { meetingId: string; lat: number; lng: number }[];
 }) {
   const [searchHeadline, setSearchHeadline] = useState("");
   // TODO searchHeadlineで表示する会議を絞る
   const meetings = prop.meetings;
+  const geocodes = prop.geocodes;
 
   const searchParam = useSearchParams();
   const [focusedMeetingId, setForcusedMeetingId] = useState<string | null>(
@@ -30,16 +33,16 @@ export default function MeetingHeadlinesPresentation(prop: {
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const handleDetail = (meeting: Meeting | null) => {
+  const handleDetail = (meetingId: string | null) => {
     const params = new URLSearchParams(searchParam);
-    if (meeting) {
-      params.set("detail", meeting.id);
+    if (meetingId) {
+      params.set("detail", meetingId);
     } else {
       params.delete("detail");
     }
     replace(`${pathname}?${params.toString()}`);
 
-    setForcusedMeetingId(meeting ? meeting.id : null);
+    setForcusedMeetingId(meetingId ? meetingId : null);
   };
 
   const handleExistedComment = (id: string, operate?: "edit" | "delete") => {
@@ -58,51 +61,75 @@ export default function MeetingHeadlinesPresentation(prop: {
     }
   };
 
+  const focusedGeocode = geocodes.filter(
+    (geocode) => geocode.meetingId === focusedMeetingId
+  );
+
+  let center = {
+    meetingId: "0",
+    // 一旦皇居にしている
+    lat: 35.685175,
+    lng: 139.7528,
+  };
+
+  if (geocodes.length > 0) {
+    center = geocodes[0];
+  }
+
+  if (focusedGeocode.length === 1) {
+    center = focusedGeocode[0];
+  }
+
   return (
-    <div className="absolute top-0 left-0 z-10 flex">
-      <div>
-        <SearchBar
-          searchValue={searchHeadline}
-          setSearchValue={setSearchHeadline}
-        />
-        <span className="bg-white h-screen">
-          {meetings.map((meeting) => {
-            return (
-              <div className="flex" key={meeting.id}>
-                <button className="w-full text-left text-lg">
-                  <Card
-                    className="text-text-primary"
-                    onClick={() => handleDetail(meeting)}
-                  >
-                    <CardHeader>
-                      <CardTitle>{meeting.name}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p>{meeting.teamName}</p>
-                      <p>{format("yyyy/MM/dd", meeting.date)}</p>
-                      <p>{"@" + meeting.place}</p>
-                    </CardContent>
-                  </Card>
-                </button>
-              </div>
-            );
-          })}
-        </span>
+    <>
+      <div className="relative z-0">
+        <Map center={center} geocodes={geocodes} handleDetail={handleDetail} />
       </div>
-      {meetings.map((meeting) =>
-        meeting.id !== focusedMeetingId ? null : (
-          <MeetingDetail
-            key={meeting.id}
-            meeting={meeting}
-            handleDetail={handleDetail}
-            setForcusNewComment={setForcusNewComment}
-            focusNewComment={focusNewComment}
-            handleExistedComment={handleExistedComment}
-            edittingComment={edittingComment}
-            deletingComment={deletingComment}
+      <div className="absolute top-0 left-0 z-10 flex">
+        <div>
+          <SearchBar
+            searchValue={searchHeadline}
+            setSearchValue={setSearchHeadline}
           />
-        )
-      )}
-    </div>
+          <span className="bg-white h-screen">
+            {meetings.map((meeting) => {
+              return (
+                <div className="flex" key={meeting.id}>
+                  <button className="w-full text-left text-lg">
+                    <Card
+                      className="text-text-primary"
+                      onClick={() => handleDetail(meeting.id)}
+                    >
+                      <CardHeader>
+                        <CardTitle>{meeting.name}</CardTitle>
+                      </CardHeader>
+                      <CardContent>
+                        <p>{meeting.teamName}</p>
+                        <p>{format("yyyy/MM/dd", meeting.date)}</p>
+                        <p>{"@" + meeting.place}</p>
+                      </CardContent>
+                    </Card>
+                  </button>
+                </div>
+              );
+            })}
+          </span>
+        </div>
+        {meetings.map((meeting) =>
+          meeting.id !== focusedMeetingId ? null : (
+            <MeetingDetail
+              key={meeting.id}
+              meeting={meeting}
+              handleDetail={handleDetail}
+              setForcusNewComment={setForcusNewComment}
+              focusNewComment={focusNewComment}
+              handleExistedComment={handleExistedComment}
+              edittingComment={edittingComment}
+              deletingComment={deletingComment}
+            />
+          )
+        )}
+      </div>
+    </>
   );
 }

@@ -14,7 +14,7 @@ import Image from "next/image";
 
 type MeetingDetailProps = {
   meeting: Meeting;
-  handleDetail: (arg: Meeting | null) => void;
+  handleDetail: (arg: string | null) => void;
   setForcusNewComment: (arg: boolean) => void;
   focusNewComment: boolean;
   handleExistedComment: (arg0: string, arg1?: "edit" | "delete") => void;
