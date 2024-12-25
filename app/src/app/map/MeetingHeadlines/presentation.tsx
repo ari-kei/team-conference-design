@@ -64,21 +64,18 @@ export default function MeetingHeadlinesPresentation({
     }
   };
 
-  const focusedGeocode = geocodes.filter(
-    (geocode) => geocode.meetingId === focusedMeetingId
-  );
-
   let center = {
     meetingId: "0",
     // 一旦皇居にしている
     lat: 35.685175,
     lng: 139.7528,
   };
-
   if (geocodes.length > 0) {
     center = geocodes[0];
   }
-
+  const focusedGeocode = geocodes.filter(
+    (geocode) => geocode.meetingId === focusedMeetingId
+  );
   if (focusedGeocode.length === 1) {
     center = focusedGeocode[0];
   }
