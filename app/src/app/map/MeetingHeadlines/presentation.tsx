@@ -14,14 +14,17 @@ import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import MeetingDetail from "@/app/_components/meeting/meetingdetail";
 
-export default function MeetingHeadlinesPresentation(prop: {
+type MeetingHeadlinesPresentationProp = {
   meetings: Meeting[];
   geocodes: { meetingId: string; lat: number; lng: number }[];
-}) {
+};
+
+export default function MeetingHeadlinesPresentation({
+  meetings,
+  geocodes,
+}: MeetingHeadlinesPresentationProp) {
   const [searchHeadline, setSearchHeadline] = useState("");
   // TODO searchHeadlineで表示する会議を絞る
-  const meetings = prop.meetings;
-  const geocodes = prop.geocodes;
 
   const searchParam = useSearchParams();
   const [focusedMeetingId, setForcusedMeetingId] = useState<string | null>(
